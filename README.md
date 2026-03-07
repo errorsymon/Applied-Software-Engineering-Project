@@ -1,4 +1,4 @@
-Automate the search, download, and organization of qualitative research datasets from public repositories. This Python tool collects interviews, field studies, ethnographic research, and other social science datasets, storing them in a clear folder structure and logging metadata in an SQLite database for easy analysis.
+Automate the search, download, and organization of qualitative research datasets from public repositories. This Python tool collects interviews, field studies, ethnographic research, and other social science datasets and many more, storing them in a clear folder structure and logging metadata in an SQLite database for easy analysis.
 
 Features
 
