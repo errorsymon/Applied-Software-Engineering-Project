@@ -1,15 +1,15 @@
-Qualitative Dataset Archive Downloader
+Automate the search, download, and organization of qualitative research datasets from public repositories. This Python tool collects interviews, field studies, ethnographic research, and other social science datasets, storing them in a clear folder structure and logging metadata in an SQLite database for easy analysis.
 
-#Project Overview
-The Qualitative Dataset Archive Downloader is a Python-based data acquisition system designed to automatically search, download, and organize qualitative research datasets from public repositories.
-The system focuses on collecting files related to qualitative research such as interviews, field studies, ethnographic research, and social science datasets.
-The downloaded files are organized locally and their metadata is stored in an SQLite database for further analysis and processing.
-This project was developed as part of an Applied Software Engineering course project.
-#Features
-• Automated dataset search using multiple qualitative research keywords
-• Multi-threaded downloading for faster performance
-• Automatic filtering of relevant file types
-• Organized folder structure for downloaded datasets
-• Metadata storage using SQLite database
-• Error handling and timeout management
-• Scalable architecture for large dataset acquisition
+Features
+
+🔍 Keyword-based Search – Quickly find datasets relevant to qualitative research.
+
+⚡ Multi-threaded Downloads – Fast and efficient downloading of large datasets.
+
+📁 Organized Storage – Maintain a clean, structured folder hierarchy.
+
+🗃️ Metadata Management – Store dataset details in SQLite for easy querying.
+
+🛠️ Robust Error Handling – Handles timeouts, missing files, and network issues.
+
+🚀 Scalable Architecture – Designed for large-scale dataset acquisition.
