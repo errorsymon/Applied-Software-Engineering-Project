@@ -1,44 +1,61 @@
 import requests
+from bs4 import BeautifulSoup
+import time
 
 
-class SiktClient:
-    # NSD merged into SIKT. Their active open repository uses the Dataverse framework.
-    BASE_URL = "https://dataverse.no/api/search"
+class FSDClient:
+    BASE_URL = "https://services.fsd.tuni.fi/catalogue/index"
 
     def search(self, query):
         tasks = []
-        try:
-            # Using the standard Dataverse API search parameters
-            params = {
-                "q": query,
-                "type": "file",  # We want direct files, not just dataset landing pages
-                "per_page": 20
-            }
+        page = 1
 
-            # Added timeout! If the server is unresponsive, it drops out after 15 seconds.
-            r = requests.get(self.BASE_URL, params=params, timeout=15)
-            r.raise_for_status()
+        print(f"Starting FSD search for: {query}")
 
-            data = r.json()
+        # FSD drops requests from Python bots. We must mimic a real browser!
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        }
 
-            # Safely navigate the JSON response
-            for item in data.get("data", {}).get("items", []):
-                # Dataverse provides a direct file 'url' and 'name'
-                file_url = item.get("url")
-                file_name = item.get("name")
+        while page <= 10:
+            try:
+                params = {
+                    "lang": "en",
+                    "q": query,
+                    "data_kind_string_facet": "Qualitative",
+                    "page": page
+                }
 
-                if file_url and file_name:
+                r = requests.get(self.BASE_URL, params=params, headers=headers, timeout=15)
+                if r.status_code != 200:
+                    break
+
+                soup = BeautifulSoup(r.text, 'html.parser')
+                study_links = soup.select('a[href^="/catalogue/study/FSD"]')
+
+                if not study_links:
+                    break
+
+                for a in study_links:
+                    href = a['href']
+                    study_id = href.split('/')[-1]
+                    title = a.text.strip()
+
+                    xml_url = f"https://services.fsd.tuni.fi/catalogue/{study_id}/DDI/{study_id}_eng.xml"
+
                     tasks.append({
-                        "url": file_url,
-                        "filename": file_name,
-                        "repository": "sikt"
+                        "url": xml_url,
+                        "filename": f"{study_id}_metadata.xml",
+                        "repository": "fsd",
+                        "metadata": title
                     })
 
-        except requests.exceptions.RequestException as e:
-            print(f"SIKT connection error: {e}")
-        except ValueError:
-            print("SIKT error: Received invalid JSON response")
-        except Exception as e:
-            print(f"SIKT unexpected error: {e}")
+                page += 1
+                time.sleep(1.5)  # Polite delay for FSD servers
 
-        return tasks
+            except Exception as e:
+                print(f"FSD scraper error: {e}")
+                break
+
+        unique_tasks = {t['url']: t for t in tasks}.values()
+        return list(unique_tasks)
