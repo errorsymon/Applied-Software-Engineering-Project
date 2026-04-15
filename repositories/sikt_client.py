@@ -1,61 +1,65 @@
 import requests
-from bs4 import BeautifulSoup
 import time
 
 
-class FSDClient:
-    BASE_URL = "https://services.fsd.tuni.fi/catalogue/index"
+class SiktClient:
+    # SIKT uses the Dataverse framework for their open data repository
+    BASE_URL = "https://dataverse.no/api/search"
 
     def search(self, query):
         tasks = []
-        page = 1
+        start = 0
+        rows = 100  # Maximize items per request
+        max_results = 2000  # High limit to ensure deep extraction without infinite loops
 
-        print(f"Starting FSD search for: {query}")
+        print(f"Starting SIKT search for: {query}")
 
-        # FSD drops requests from Python bots. We must mimic a real browser!
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-        }
-
-        while page <= 10:
+        while start < max_results:
             try:
                 params = {
-                    "lang": "en",
                     "q": query,
-                    "data_kind_string_facet": "Qualitative",
-                    "page": page
+                    "type": "file",  # Targeting files directly
+                    "start": start,
+                    "per_page": rows
                 }
 
-                r = requests.get(self.BASE_URL, params=params, headers=headers, timeout=15)
+                # Robust timeout to prevent pipeline hanging
+                r = requests.get(self.BASE_URL, params=params, timeout=20)
+
                 if r.status_code != 200:
+                    print(f"SIKT API returned status {r.status_code}. Stopping pagination.")
                     break
 
-                soup = BeautifulSoup(r.text, 'html.parser')
-                study_links = soup.select('a[href^="/catalogue/study/FSD"]')
+                data = r.json()
+                items = data.get("data", {}).get("items", [])
 
-                if not study_links:
-                    break
+                if not items:
+                    break  # Break the loop if we've reached the end of the results
 
-                for a in study_links:
-                    href = a['href']
-                    study_id = href.split('/')[-1]
-                    title = a.text.strip()
+                for item in items:
+                    file_url = item.get("url")
+                    file_name = item.get("name")
+                    # Extracting dataset description for Part 2 Classification
+                    description = item.get("description", "")
 
-                    xml_url = f"https://services.fsd.tuni.fi/catalogue/{study_id}/DDI/{study_id}_eng.xml"
+                    if file_url and file_name:
+                        tasks.append({
+                            "url": file_url,
+                            "filename": file_name,
+                            "repository": "sikt_dataverse",
+                            "metadata": description
+                        })
 
-                    tasks.append({
-                        "url": xml_url,
-                        "filename": f"{study_id}_metadata.xml",
-                        "repository": "fsd",
-                        "metadata": title
-                    })
+                start += rows
+                time.sleep(0.5)  # Be polite to the SIKT servers to avoid rate limiting
 
-                page += 1
-                time.sleep(1.5)  # Polite delay for FSD servers
-
+            except requests.exceptions.RequestException as e:
+                print(f"SIKT connection error at offset {start}: {e}")
+                break
             except Exception as e:
-                print(f"FSD scraper error: {e}")
+                print(f"SIKT unexpected error: {e}")
                 break
 
+        # Deduplicate tasks based on URL to avoid redundant downloads
         unique_tasks = {t['url']: t for t in tasks}.values()
         return list(unique_tasks)
