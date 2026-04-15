@@ -1,52 +1,61 @@
 import requests
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin
+import time
 
 
 class FSDClient:
-    # Using the HTML catalogue endpoint provided in the project document
     BASE_URL = "https://services.fsd.tuni.fi/catalogue/index"
 
     def search(self, query):
         tasks = []
-        try:
-            # Query parameters specifically targeting Qualitative data in English
-            params = {
-                "lang": "en",
-                "q": query,
-                "data_kind_string_facet": "Qualitative",
-                "limit": 50
-            }
+        page = 1
 
-            # Added timeout to prevent pipeline hanging
-            r = requests.get(self.BASE_URL, params=params, timeout=15)
-            r.raise_for_status()
+        print(f"Starting FSD search for: {query}")
 
-            # Parse the HTML response
-            soup = BeautifulSoup(r.text, 'html.parser')
+        # FSD drops requests from Python bots. We must mimic a real browser!
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        }
 
-            # Extract links from the search results
-            for a in soup.find_all('a', href=True):
-                href = a['href']
+        while page <= 10:
+            try:
+                params = {
+                    "lang": "en",
+                    "q": query,
+                    "data_kind_string_facet": "Qualitative",
+                    "page": page
+                }
 
-                # Filter for links that look like study/dataset pages or direct files
-                if "/catalogue/study/" in href or "/download" in href.lower():
-                    full_url = urljoin(self.BASE_URL, href)
+                r = requests.get(self.BASE_URL, params=params, headers=headers, timeout=15)
+                if r.status_code != 200:
+                    break
 
-                    # FSD filenames are often hidden behind dataset pages,
-                    # so we generate a safe fallback name based on the URL
-                    safe_name = href.split('/')[-1] if not href.endswith('/') else "fsd_dataset"
+                soup = BeautifulSoup(r.text, 'html.parser')
+                study_links = soup.select('a[href^="/catalogue/study/FSD"]')
+
+                if not study_links:
+                    break
+
+                for a in study_links:
+                    href = a['href']
+                    study_id = href.split('/')[-1]
+                    title = a.text.strip()
+
+                    xml_url = f"https://services.fsd.tuni.fi/catalogue/{study_id}/DDI/{study_id}_eng.xml"
 
                     tasks.append({
-                        "url": full_url,
-                        "filename": safe_name,
-                        "repository": "fsd"
+                        "url": xml_url,
+                        "filename": f"{study_id}_metadata.xml",
+                        "repository": "fsd",
+                        "metadata": title
                     })
 
-        except Exception as e:
-            # Catching the error cleanly so it returns an empty list instead of crashing
-            print(f"FSD error for query '{query}': {e}")
+                page += 1
+                time.sleep(1.5)  # Polite delay for FSD servers
 
-        # Deduplicate tasks based on URL to avoid downloading the same page twice
+            except Exception as e:
+                print(f"FSD scraper error: {e}")
+                break
+
         unique_tasks = {t['url']: t for t in tasks}.values()
         return list(unique_tasks)
