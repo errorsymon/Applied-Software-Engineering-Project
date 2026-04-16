@@ -206,6 +206,7 @@ QDArchive/
 ├── downloads/                 # Local storage for all downloaded data
 ├── 23088045-sq26.db           # Main SQLite Database
 └── README.md
+text
 This project successfully demonstrates:
 
 An aggressive but polite automated data acquisition pipeline.
