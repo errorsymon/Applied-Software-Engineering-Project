@@ -109,7 +109,7 @@ Stored:
 
 Metadata descriptions directly into the database to feed the classifier
 
-How to Run
+# How to Run
 1. Run Data Acquisition (Part 1):
 
 Bash
@@ -144,7 +144,7 @@ QDA Files (Primary Target)
 Associated / Primary Files
 .pdf, .docx, .txt, .csv, .xlsx, .zip, .mp3, .mp4
 
-Limitations
+# Limitations
 1. FSD Data Restrictions
 FSD strictly protects raw qualitative transcripts (requires academic login).
 
@@ -161,7 +161,7 @@ True QDA software files (like .mx24 or .nvpx) are still relatively rare.
 
 Researchers often share raw transcripts or PDFs rather than their active coding files.
 
-Technical Challenges
+# Technical Challenges
 Programming Challenges
 SQLite Multithreading Crashes
 Problem: Signal 11 (SIGSEGV) crashes occurred when multiple threads attempted to write to the database simultaneously.
