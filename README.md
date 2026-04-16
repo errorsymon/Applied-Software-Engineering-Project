@@ -99,11 +99,11 @@ Metadata descriptions directly into the database to feed the classifier
 # How to Run
 1. Run Data Acquisition (Part 1):
 
-Bash
+# Bash
 python main.py
 2. Run ISIC Rev. 5 Classification (Part 2):
 
-Bash
+# Bash
 python classifier.py
 Database Structure
 Database: 23088045-sq26.db
