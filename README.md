@@ -12,36 +12,23 @@ University: Friedrich-Alexander-Universität Erlangen-Nürnberg (FAU)
 Project Overview
 This project is part of the Seeding QDArchive initiative.
 
-The goal is to automatically collect qualitative research datasets from public repositories, store them in a structured database, and systematically classify them using the ISIC Rev. 5 taxonomy.
+### The System
+* Searches repositories using hyper-specific qualitative and QDA-software queries
+* Bypasses bot-detection and gracefully handles API rate limits
+* Downloads available dataset files (QDA and primary files) concurrently
+* Extracts metadata (descriptions) for automated text classification
+* Categorizes data into ISIC Rev. 5 Divisions
+* Reconstructs fragmented downloads into logical project folders
+* Provides a robust, classified foundation for QDArchive, a platform for sharing qualitative research data
 
-The system:
+### Project Goals
+* Discover qualitative datasets across diverse academic fields
+* Download QDA formats and associated media/text files
+* Extract rich metadata (abstracts, titles, descriptions)
+* Store everything in a thread-safe SQLite database
+* Classify datasets automatically using ISIC Rev. 5 standards
+* Reconstruct datasets locally for QDArchive ingestion
 
-Searches repositories using hyper-specific qualitative and QDA-software queries
-
-Bypasses bot-detection and gracefully handles API rate limits
-
-Downloads available dataset files (QDA and primary files) concurrently
-
-Extracts metadata (descriptions) for automated text classification
-
-Categorizes data into ISIC Rev. 5 Divisions
-
-Reconstructs fragmented downloads into logical project folders
-
-This project provides a robust, classified foundation for QDArchive, a platform for sharing qualitative research data.
-
-Project Goal
-Discover qualitative datasets across diverse academic fields
-
-Download QDA formats and associated media/text files
-
-Extract rich metadata (abstracts, titles, descriptions)
-
-Store everything in a thread-safe SQLite database
-
-Classify datasets automatically using ISIC Rev. 5 standards
-
-Reconstruct datasets locally for QDArchive ingestion
 
 Assigned Repositories
 #	Repository	URL	Method
