@@ -191,12 +191,13 @@ Thread-Safe Architecture: Protected the database from corruption during concurre
 
 Custom Config: Highly tuned configurations capturing over 80+ file variations (including Mac/PC specific software extensions).
 
-Project Structure
-Plaintext
+# Project Structure
+
+```text
 QDArchive/
 │
 ├── config.py                  # Global settings, file extensions, and queries
-├── main.py                    # Acquistion execution script
+├── main.py                    # Acquisition execution script
 ├── classifier.py              # ISIC Rev. 5 classification script
 ├── logger.py                  # Centralized logging
 │
@@ -218,7 +219,6 @@ QDArchive/
 ├── downloads/                 # Local storage for all downloaded data
 ├── 23088045-sq26.db           # Main SQLite Database
 └── README.md
-Conclusion
 This project successfully demonstrates:
 
 An aggressive but polite automated data acquisition pipeline.
