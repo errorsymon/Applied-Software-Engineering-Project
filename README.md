@@ -210,7 +210,7 @@ QDArchive/
 └── confiq.py
 └── README.md
 
-text
+
 This project successfully demonstrates:
 
 An aggressive but polite automated data acquisition pipeline.
