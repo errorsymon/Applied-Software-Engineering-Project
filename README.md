@@ -205,7 +205,11 @@ QDArchive/
 │
 ├── downloads/                 # Local storage for all downloaded data
 ├── 23088045-sq26.db           # Main SQLite Database
+└── classifier.py
+└── requirements.py
+└── confiq.py
 └── README.md
+
 text
 This project successfully demonstrates:
 
